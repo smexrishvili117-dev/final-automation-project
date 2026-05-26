@@ -1,0 +1,114 @@
+describe('Authorization Tests', () => {
+
+  let user
+
+  before(() => {
+    cy.fixture('users').then((data) => {
+      user = data
+    })
+  })
+
+  it('ტესტი 1 - Successful Login', () => {
+
+    cy.login(user.validUser.email, user.validUser.password)
+
+    cy.url().should('not.include', '/login')
+
+    cy.get('a.iprof').should('exist')
+
+  })
+
+  it('ტესტი 2 - Empty Login Validation', () => {
+
+    cy.visit('/ka')
+
+    cy.get('a.rprof').first().click()
+
+    cy.get('input[type="email"]').first().should('be.visible')
+
+    cy.get('input[type="email"]').first().clear()
+
+    cy.get('input.ipass').first().clear()
+
+    cy.get('button.form-button').first().click()
+
+    cy.get('input[type="email"]').should('have.value', '')
+
+    cy.contains('ავტორიზაცია').should('exist')
+
+  })
+
+  it('ტესტი 3 - Add Product To Cart', () => {
+
+    cy.fixture('products').then((product) => {
+
+      cy.visit('/ka')
+
+      cy.get('body').should('contain', 'bosch')
+
+      cy.contains('Bosch').click()
+
+      cy.get('button').last().click({ force: true })
+
+      cy.wait(2000)
+
+      cy.visit('/ka/cart')
+
+      cy.reload()
+
+      cy.get('body').should('contain', 'bosch')
+
+    })
+
+  })
+
+  it('ტესტი 4 - Remove Product From Cart', () => {
+
+    cy.fixture('users').then((user) => {
+
+      cy.login(user.validUser.email, user.validUser.password)
+
+      cy.visit('/ka')
+
+      cy.contains('Bosch').click()
+
+      cy.get('button').last().click({ force: true })
+
+      cy.visit('/ka/cart')
+
+      cy.get('svg').first().click({ force: true })
+
+      cy.reload()
+
+      cy.get('body').should('not.contain', 'Bosch')
+
+    })
+
+  })
+
+  it('ტესტი 5 - Register Without Terms', () => {
+
+    cy.fixture('users').then((user) => {
+
+      cy.visit('/ka/register')
+
+      cy.get('input[placeholder="სახელი გვარი"]').first().type('Salome')
+
+      cy.get('input[type="email"]').first().type(user.validUser.email)
+
+      cy.get('input[type="password"]').first().type(user.validUser.password)
+
+      cy.get('input[type="password"]:visible').last().type(user.validUser.password)
+
+      cy.get('button').contains('რეგისტრაცია').click({ force: true })
+
+      cy.url().should('include', '/register')
+
+      cy.get('body').should('contain', 'რეგისტრაცია')
+
+    })
+
+  })
+
+})
+perl -0pi -e "s/cy\.get\('body'\)\.should\('contain', 'bosch'\)\n\n\s*cy\.contains\('Bosch'\)\.click\(\)/cy.contains('Bosch').click()\n\n      cy.get('button').last().click({ force: true })\n\n      cy.wait(2000)\n\n      cy.visit('\/ka\/cart')\n\n      cy.reload()\n\n      cy.get('body').should('contain', 'bosch')/s" cypress/e2e/a

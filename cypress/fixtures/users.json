@@ -1,0 +1,10 @@
+{
+  "validUser": {
+    "email": "salome.mekhrishvili04@gmail.com",
+    "password": "salome"
+  },
+  "invalidUser": {
+    "email": "salome.mekhrishvili04@gmail.com",
+    "password": "არასწორი პაროლი"
+  }
+}
